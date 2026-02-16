@@ -43,9 +43,9 @@ e.g.,
 [sysroot/20181213](https://github.com/illumos/illumos-gate/tree/sysroot/20181213).
 The environment file lives in this repository under `env/`.
 
-You'll need to install Rust (to build `mf2tar`) and a C compiler (to build the
-shims).  Once you have those, and you have your illumos packages, making the
-archive is (hopefully!) as simple as:
+You'll need to install either Rust (to build `mf2tar`) or Python 3 (to use
+`mf2tar.py`), and a C compiler (to build the shims). Once you have those, and
+you have your illumos packages, making the archive is (hopefully!) as simple as:
 
 ```
 $ gmake archive \
@@ -112,3 +112,26 @@ we expect in the real thing.  This doesn't matter in practice, as the sysroot
 is for cross compilation; the build machine must not execute program text for
 the target machine.  These shim libraries are created through mapfiles and stub
 code built from this repository.
+
+## Tools
+
+### mf2tar (Rust)
+
+The original `mf2tar` utility is written in Rust and converts IPS manifests to
+TAR archives. It's fast and efficient for processing large repositories.
+
+Location: `mf2tar/`
+
+Build: `cd mf2tar && cargo build --release`
+
+### mf2tar.py (Python)
+
+A Python 3 implementation of `mf2tar` that provides the same functionality
+without requiring Rust. Uses Python standard library only, making it portable
+and easy to use anywhere that Python 3 is supported.
+
+Location: `mf2tar.py`
+
+Build: (nothing -- it's interpreted)
+
+Usage: `./mf2tar.py --help`

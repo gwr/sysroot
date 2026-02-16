@@ -18,7 +18,11 @@ TARFILE =		$(OUTPUT)/$(TARBASE)-$(TARVERSION).tar
 USRLIB =		usr/lib
 USRLIB64 =		usr/lib/$(MACH64)
 
-MF2TAR =		$(PWD)/mf2tar/target/release/mf2tar
+PY_MF2TAR = 		$(PWD)/mf2tar.py
+RUST_MF2TAR =		$(PWD)/mf2tar/target/release/mf2tar
+
+# Which to run (Python is easier)
+MF2TAR = 		$(PY_MF2TAR)
 
 #
 # A list of IPS packages to include in the sysroot archive.  Note that no
@@ -70,8 +74,8 @@ $(LIBGCC_32) $(LIBGCC_64):
 $(LIBSSP_32) $(LIBSSP_64):
 	$(MAKE) -C shims/libssp
 
-.PHONY: $(MF2TAR)
-$(MF2TAR):
+#? .PHONY: $(RUST_MF2TAR)
+$(RUST_MF2TAR):
 	cd mf2tar && cargo build --release
 
 $(OUTPUT):
@@ -87,6 +91,42 @@ archive: $(SHIM_TARGETS) | $(OUTPUT) $(MF2TAR)
 	$(MF2TAR) \
 	    --repository $(ILLUMOS_PKGREPO) \
 	    $(addprefix -P ,$(INCLUDE_PACKAGES)) \
+	    $(addprefix -E ,$(EXCLUDE_DIRS)) \
+	    \
+	    --file $(USRLIB)/libgcc_s.so.1=$(LIBGCC_32) \
+	    --file $(USRLIB64)/libgcc_s.so.1=$(LIBGCC_64) \
+	    --link $(USRLIB)/libgcc_s.so=libgcc_s.so.1 \
+	    --link $(USRLIB64)/libgcc_s.so=libgcc_s.so.1 \
+	    \
+	    --file $(USRLIB)/libssp.so.0.0.0=$(LIBSSP_32) \
+	    --file $(USRLIB64)/libssp.so.0.0.0=$(LIBSSP_64) \
+	    --link $(USRLIB)/libssp.so.0=libssp.so.0.0.0 \
+	    --link $(USRLIB)/libssp.so=libssp.so.0.0.0 \
+	    --link $(USRLIB64)/libssp.so.0=libssp.so.0.0.0 \
+	    --link $(USRLIB64)/libssp.so=libssp.so.0.0.0 \
+	    \
+	    $(TARFILE)
+	gzip < $(TARFILE) > $(TARFILE).gz
+
+#
+# Alternative demonstrating proto root + manifest files
+#
+.PHONY: archive2
+archive2: $(SHIM_TARGETS) | $(OUTPUT) $(MF2TAR)
+	@if [[ -z "$(ILLUMOS_GATE)" || \
+		! -d "$(ILLUMOS_GATE)/proto/root_$(MACH)" ]]; then \
+		printf 'ERROR: need built ILLUMOS_GATE location\n' >&2; \
+		exit 1; \
+	fi
+	$(MF2TAR) \
+	    --proto $(ILLUMOS_GATE)/proto/root_$(MACH) \
+	    --manifest $(ILLUMOS_GATE)/usr/src/pkg/manifests/system-header.mf \
+	    --manifest $(ILLUMOS_GATE)/usr/src/pkg/manifests/system-library.mf \
+	    --manifest $(ILLUMOS_GATE)/usr/src/pkg/manifests/system-library-math.mf \
+	    --manifest $(ILLUMOS_GATE)/usr/src/pkg/manifests/system-library-c-runtime.mf \
+	    --manifest $(ILLUMOS_GATE)/usr/src/pkg/manifests/system-library-security-gss.mf \
+	    --define ARCH=$(MACH) \
+	    --define ARCH64=$(MACH64) \
 	    $(addprefix -E ,$(EXCLUDE_DIRS)) \
 	    \
 	    --file $(USRLIB)/libgcc_s.so.1=$(LIBGCC_32) \
