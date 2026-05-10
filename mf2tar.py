@@ -325,10 +325,10 @@ class TarBuilder:
 
         if append and tar_path.exists():
             # Open for appending
-            self.tar = tarfile.open(tar_path, 'a')
+            self.tar = tarfile.open(tar_path, 'a', format=tarfile.USTAR_FORMAT)
         else:
             # Create new or overwrite
-            self.tar = tarfile.open(tar_path, 'w')
+            self.tar = tarfile.open(tar_path, 'w', format=tarfile.USTAR_FORMAT)
 
         self.mtime = int(time.time())
 
