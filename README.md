@@ -135,3 +135,12 @@ Location: `mf2tar.py`
 Build: (nothing -- it's interpreted)
 
 Usage: `./mf2tar.py --help`
+
+### build-adjuncts.sh (ksh/bash)
+
+A ksh (or bash) script to create an illumos-adjucts directory from an IPS
+package server.  Creates files/directories it in the current directory.
+Note: Requires mf2tar.py from this directory.
+
+This tool is not directly for "sysroot" but the processing and tools it
+uses are very similar so this is a convenient place to keep it.
