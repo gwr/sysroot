@@ -50,6 +50,7 @@ Common options:
 """
 
 import argparse
+import fnmatch
 import gzip
 import hashlib
 import os
@@ -421,7 +422,8 @@ def iterate_manifest_with_includes(manifest_path: Path, defines: Dict[str, str],
                 if hasattr(entry, 'path'):
                     excluded = False
                     for exclude in excludes:
-                        if entry.path == exclude or entry.path.startswith(exclude + '/'):
+                        if (fnmatch.fnmatch(entry.path, exclude) or
+                            fnmatch.fnmatch(entry.path, exclude + '/*')):
                             excluded = True
                             break
 
