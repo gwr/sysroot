@@ -25,6 +25,7 @@ PKG_CUPS="ooce/print/cups"
 PACKAGES=(
     library/glib2
     library/libxml2
+    library/nspr
     library/security/openssl-3
     library/security/trousers
     ${PERL_PKG}
@@ -39,12 +40,13 @@ EXCLUDES=(
     usr/lib/cups
     'usr/lib/python*'
     'usr/openssl/*/share'
-    usr/perl5
+    'usr/perl5/*/man'
     usr/share
     usr/bin
     usr/sbin
     usr/sfw
     usr/ssl-3/man
+    opt/ooce/bin
     opt/ooce/cups
     opt/ooce/share
     etc
