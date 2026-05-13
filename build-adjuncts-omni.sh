@@ -30,6 +30,7 @@ PACKAGES=(
     ${PERL_PKG}
     ${PYTHON_PKG}
     system/library/libdbus
+    system/library/libdbus-glib
     system/library/mozilla-nss
     system/management/snmp/net-snmp
 )
