@@ -18,6 +18,7 @@ PYTHON_PKG=$(pkg contents -H -o fmri -t depend runtime/python |head -1)
 
 PACKAGES=(
     library/glib2
+    library/glib2/32
     library/libxml2
     library/security/openssl-3
     library/security/trousers
